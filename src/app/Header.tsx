@@ -34,11 +34,14 @@ interface Book {
   quantity: number;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const CORS_URL = process.env.NEXT_PUBLIC_CORS_URL;
+const API_URL = `${CORS_URL}${BASE_URL}`;
 
 type AlertType = 'info' | 'success' | 'fail';
 
-export default function Header() {
+export default function Header() {    
   const dispatch = useDispatch<AppDispatch>();
   // const router = useRouter();
   const usernameRef = useRef<HTMLInputElement>(null);
