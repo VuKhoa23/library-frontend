@@ -53,9 +53,7 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL}/books/` + params.bookId
-        );
+        const response = await axios.get(`${API_URL}/books/` + params.bookId);
         setBook(response.data);
         console.log(response.data);
       } catch (error) {
@@ -68,6 +66,7 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
       const decoded = jwtDecode<CustomJwtPayload>(token);
       setRole(decoded['user-details'].roles[0]);
     }
+    console.log(role === '');
   }, []);
 
   const alert = (type: AlertType, title: string, subtitle: string) => {
@@ -99,13 +98,13 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
       };
       console.log(body);
       console.log(headers);
-      const response = await axios.post(
-        `${API_URL}/rent`,
-        body,
-        { headers }
-      );
+      const response = await axios.post(`${API_URL}/rent`, body, { headers });
       console.log(response.data);
-      alert("success", "Rent book successfully!", `You've rented ${book?.name}`);
+      alert(
+        'success',
+        'Rent book successfully!',
+        `You've rented ${book?.name}`
+      );
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 403) {
@@ -204,193 +203,181 @@ export default function BookDetail({ params }: { params: { bookId: string } }) {
           <span className="text-rose-500">{book?.quantity}</span>
         </p>
       </div>
-      <div className=" grid grid-rows-2 gap-3">
-        <div className=" w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
-          {role === 'USER' || role === "" && (
-            <div className="space-y-6">
-              <h5 className="text-2xl font-medium text-gray-900">
-                Enter end date to rent a book
-              </h5>
-              <div>
-                <label
-                  htmlFor="endDate"
-                  className="block mb-2 text-sm font-medium text-gray-900"
-                >
-                  End date
-                </label>
-                <input
-                  type="date"
-                  name="endDate"
-                  id="endDate"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                  placeholder="tphcm"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="max-w-xs"></div>
-              <button
-                onClick={() => handleRentBook()}
-                type="submit"
-                className="w-full text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-base px-5 py-2.5 text-center"
-              >
-                Rent now
-              </button>
-            </div>
-          )}
-          {role === 'ADMIN' && (
-            <div className="space-y-6">
-              {/* <h5 className="text-2xl font-medium text-gray-900">
-              Enter end date to rent a book
-            </h5>
-            <div>
-              <label
-                htmlFor="endDate"
-                className="block mb-2 text-sm font-medium text-gray-900"
-              >
-                End date
-              </label>
-              <input
-                type="date"
-                name="endDate"
-                id='endDate'
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                placeholder="tphcm"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                required
-              />
-            </div> */}
-              <form className="max-w-xs">
-                <label
-                  htmlFor="quantity-input"
-                  className="block mb-2 text-sm font-medium text-gray-900"
-                >
-                  Add more quantity to{' '}
-                  <span className="font-bold">{book?.name}</span>
-                </label>
-                <div className="relative flex items-center max-w-[8rem]">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (quantity === 1) {
-                        return;
-                      }
-                      setQuantity(quantity - 1);
-                    }}
-                    id="decrement-button"
-                    data-input-counter-decrement="quantity-input"
-                    className="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 focus:ring-2 focus:outline-none"
-                  >
-                    <svg
-                      className="w-3 h-3 text-gray-900"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 18 2"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M1 1h16"
-                      />
-                    </svg>
-                  </button>
-                  <input
-                    type="number"
-                    id="quantity-input"
-                    data-input-counter
-                    aria-describedby="helper-text-explanation"
-                    className="bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5"
-                    value={quantity}
-                    disabled
-                    onChange={(e) => setQuantity(Number(e.target.value))}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setQuantity(quantity + 1)}
-                    id="increment-button"
-                    data-input-counter-increment="quantity-input"
-                    className="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 focus:ring-2 focus:outline-none"
-                  >
-                    <svg
-                      className="w-3 h-3 text-gray-900"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 18 18"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 1v16M1 9h16"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </form>
-              <button
-                onClick={() => handleAddQuantity()}
-                type="submit"
-                className="w-full text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-base px-5 py-2.5 text-center"
-              >
-                Add quantity
-              </button>
-            </div>
-          )}
-        </div>
-        <div className=" w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
-          <div className="space-y-6">
-            <form className="w-full">
-              <div className="flex gap-6">
-                <div className="mb-5">
-                  <label
-                    htmlFor="base-input"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                  >
-                    Book name
-                  </label>
-                  <input
-                    value={newBookName}
-                    onChange={(e) => setNewBookName(e.target.value)}
-                    type="text"
-                    id="base-input"
-                    placeholder="Enter new book's name"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                  />
-                </div>
-                <div className="mb-5">
-                  <label
-                    htmlFor="base-input"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                  >
-                    Category ID
-                  </label>
-                  <input
-                    value={newCatID}
-                    onChange={(e) => setNewCatID(Number(e.target.value))}
-                    type="number"
-                    id="base-input"
-                    placeholder="Enter category ID"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
-                  />
-                </div>
-              </div>
-            </form>
-            <button
-              onClick={() => handleUpdateBook()}
-              type="button"
-              className="focus:outline-none text-white w-full bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-base px-5 py-2.5 me-2 mb-2"
+      <div className={``}>
+        {role === 'USER' ||
+          (role === '' && (
+            <div
+              className={`grid grid-rows-1 w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8`}
             >
-              Update book
-            </button>
+              <div className="space-y-6">
+                <h5 className="text-2xl font-medium text-gray-900">
+                  Enter end date to rent a book
+                </h5>
+                <div>
+                  <label
+                    htmlFor="endDate"
+                    className="block mb-2 text-sm font-medium text-gray-900"
+                  >
+                    End date
+                  </label>
+                  <input
+                    type="date"
+                    name="endDate"
+                    id="endDate"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="tphcm"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="max-w-xs"></div>
+                <button
+                  onClick={() => handleRentBook()}
+                  type="submit"
+                  className="w-full text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-base px-5 py-2.5 text-center"
+                >
+                  Rent now
+                </button>
+              </div>
+            </div>
+          ))}
+        {role === 'ADMIN' && (
+          <div
+            className={`grid grid-rows-2 w-full p-4 bg-white border border-gray-200 gap-3 rounded-lg shadow sm:p-6 md:p-8`}
+          >
+            <div className=" w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
+              <div className="space-y-6">
+                <form className="max-w-xs">
+                  <label
+                    htmlFor="quantity-input"
+                    className="block mb-2 text-sm font-medium text-gray-900"
+                  >
+                    Add more quantity to{' '}
+                    <span className="font-bold">{book?.name}</span>
+                  </label>
+                  <div className="relative flex items-center max-w-[8rem]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (quantity === 1) {
+                          return;
+                        }
+                        setQuantity(quantity - 1);
+                      }}
+                      id="decrement-button"
+                      data-input-counter-decrement="quantity-input"
+                      className="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 focus:ring-2 focus:outline-none"
+                    >
+                      <svg
+                        className="w-3 h-3 text-gray-900"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 2"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M1 1h16"
+                        />
+                      </svg>
+                    </button>
+                    <input
+                      type="number"
+                      id="quantity-input"
+                      data-input-counter
+                      aria-describedby="helper-text-explanation"
+                      className="bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5"
+                      value={quantity}
+                      disabled
+                      onChange={(e) => setQuantity(Number(e.target.value))}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(quantity + 1)}
+                      id="increment-button"
+                      data-input-counter-increment="quantity-input"
+                      className="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 focus:ring-2 focus:outline-none"
+                    >
+                      <svg
+                        className="w-3 h-3 text-gray-900"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 18"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 1v16M1 9h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+                <button
+                  onClick={() => handleAddQuantity()}
+                  type="submit"
+                  className="w-full text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-base px-5 py-2.5 text-center"
+                >
+                  Add quantity
+                </button>
+              </div>
+            </div>
+            <div className=" w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8">
+              <div className="space-y-6">
+                <form className="w-full">
+                  <div className="flex gap-6">
+                    <div className="mb-5">
+                      <label
+                        htmlFor="base-input"
+                        className="block mb-2 text-sm font-medium text-gray-900"
+                      >
+                        Book name
+                      </label>
+                      <input
+                        value={newBookName}
+                        onChange={(e) => setNewBookName(e.target.value)}
+                        type="text"
+                        id="base-input"
+                        placeholder="Enter new book's name"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                      />
+                    </div>
+                    <div className="mb-5">
+                      <label
+                        htmlFor="base-input"
+                        className="block mb-2 text-sm font-medium text-gray-900"
+                      >
+                        Category ID
+                      </label>
+                      <input
+                        value={newCatID}
+                        onChange={(e) => setNewCatID(Number(e.target.value))}
+                        type="number"
+                        id="base-input"
+                        placeholder="Enter category ID"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                      />
+                    </div>
+                  </div>
+                </form>
+                <button
+                  onClick={() => handleUpdateBook()}
+                  type="button"
+                  className="focus:outline-none text-white w-full bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-base px-5 py-2.5 me-2 mb-2"
+                >
+                  Update book
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
       <Alert
         type={alertType}

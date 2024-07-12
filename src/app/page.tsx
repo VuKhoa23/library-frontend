@@ -37,7 +37,7 @@ export default function Home() {
   const [thumbnails, setThumbnails] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   useEffect(() => {
-    console.log("base url", API_URL);
+    console.log('base url', API_URL);
     const fetchData = async () => {
       try {
         let response;

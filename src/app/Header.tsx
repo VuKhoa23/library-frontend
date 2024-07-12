@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX, faUser } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
@@ -11,6 +11,7 @@ import Alert from './Alert';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from './GlobalRedux/store';
 import { addBook } from './GlobalRedux/Features/Books/booksSlice';
+import { useRouter } from 'next/router';
 
 interface CustomJwtPayload extends JwtPayload {
   sub: string;
@@ -39,6 +40,9 @@ type AlertType = 'info' | 'success' | 'fail';
 
 export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
+  // const router = useRouter();
+  const usernameRef = useRef<HTMLInputElement>(null);
+  const btnSubmit = useRef<HTMLButtonElement>(null);
 
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [isAddBook, setIsAddBook] = useState<boolean>(false);
@@ -89,7 +93,24 @@ export default function Header() {
       setUserId(decoded.userId);
       setRole(decoded['user-details'].roles[0]);
     }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if(event.key === "Enter") {
+        console.log("here")
+        if(btnSubmit.current) {
+          console.log("here");
+          btnSubmit.current.click();
+        }
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    if(openModal && usernameRef.current) {
+      console.log("here");
+      usernameRef.current.focus();
+    }
+  }, [openModal])
 
   const clearUserInput = () => {
     setPassword('');
@@ -116,10 +137,7 @@ export default function Header() {
       };
       if (isSignUp) {
         try {
-          const response = await axios.post(
-            `${API_URL}/auth/register`,
-            body
-          );
+          const response = await axios.post(`${API_URL}/auth/register`, body);
           clearUserInput();
           setSignUpSuccess(true);
           setIsSignUp(false);
@@ -140,10 +158,7 @@ export default function Header() {
         return;
       } else {
         try {
-          const response = await axios.post(
-            `${API_URL}/auth/login`,
-            body
-          );
+          const response = await axios.post(`${API_URL}/auth/login`, body);
           console.log(response.data);
           // localStorage.setItem("userId", response.data.userId);
           // Cookies.set('userId', response.data.userId);
@@ -177,7 +192,7 @@ export default function Header() {
             console.log('Unexpected error: ', error);
           }
         }
-        return;
+        return; 
       }
     } else {
       return;
@@ -189,6 +204,7 @@ export default function Header() {
     setAccesstoken('');
     setRole('');
     alert('info', 'Logged out successfully !', '');
+    // router.push('http://localhost:3000');
   };
 
   const handleisAddBook = async () => {
@@ -200,11 +216,7 @@ export default function Header() {
       const headers = {
         Authorization: `Bearer ${Cookies.get('accessToken')}`,
       };
-      const response = await axios.post(
-        `${API_URL}/books`,
-        body,
-        { headers }
-      );
+      const response = await axios.post(`${API_URL}/books`, body, { headers });
       // console.log(response.data);
       const newBook: Book = response.data;
       // console.log(newBook);
@@ -216,7 +228,6 @@ export default function Header() {
       );
       setNewBookName('');
       setNewCatID(0);
-      
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log(error);
@@ -295,13 +306,13 @@ export default function Header() {
                       </a>
                     </li>
                     <li>
-                      <a
+                      <Link
                         onClick={() => handleSignOut()}
-                        href="#"
+                        href="/"
                         className="block px-4 py-2 hover:bg-indigo-100"
                       >
                         Sign out
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </div>
@@ -362,6 +373,7 @@ export default function Header() {
                         Username
                       </label>
                       <input
+                        ref={usernameRef}
                         type="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
@@ -535,7 +547,11 @@ interface isAddBookProps {
   children: React.ReactNode;
 }
 
-const AddBookModal: React.FC<isAddBookProps> = ({ open, onClose, children }) => {
+const AddBookModal: React.FC<isAddBookProps> = ({
+  open,
+  onClose,
+  children,
+}) => {
   return (
     <div
       //   onClick={onClose}

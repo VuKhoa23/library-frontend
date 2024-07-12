@@ -42,10 +42,9 @@ export default function UserDashboard({
         const headers = {
           Authorization: `Bearer ${token}`,
         };
-        const response = await axios.get(
-          `${API_URL}/rent/` + params.userId,
-          { headers }
-        );
+        const response = await axios.get(`${API_URL}/rent/` + params.userId, {
+          headers,
+        });
         console.log(response.data);
         if (response.data.length === 0) {
           setEmptyList(true);
