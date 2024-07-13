@@ -31,6 +31,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const CORS_URL = process.env.NEXT_PUBLIC_CORS_URL;
 const API_URL = `${CORS_URL}${BASE_URL}`;
 // const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL_DEPLOYED;
+// const temp_api = "http://54.151.185.181:8080/api/books"
 
 
 export default function Home() {
@@ -46,6 +47,7 @@ export default function Home() {
       try {
         let response;
         // response = await axios.get('http://localhost:8080/api/books');
+        console.log(`${API_URL}/books`);
         response = await axios.get(`${API_URL}/books`);
         // response = await axios.get('/api/proxy/books');
         console.log(response.data);
